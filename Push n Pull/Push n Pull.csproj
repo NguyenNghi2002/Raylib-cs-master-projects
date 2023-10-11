@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace>Push_n_Pull</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="bin\Debug\net6.0\.asset\rules.txt" />
+    <Content Include="bin\Debug\net6.0\.asset\tilemap_template(160x160)-export.png" />
+    <Content Include="bin\Debug\net6.0\.asset\tilemap_template(16x16).png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Engine\Engine.csproj" />
+    <ProjectReference Include="..\VelcroPhysic2D\Engine.VelcroPhysic2D.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="bin\Debug\net6.0\.asset\test.tmx" />
+    <None Include="bin\Debug\net6.0\.asset\tilemap_rule.tmx" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,57 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace>_3dWorld</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="bin\Debug\net6.0\brickwall.jpg" />
+    <Content Include="bin\Debug\net6.0\brickwall_normal.jpg" />
+    <Content Include="bin\Debug\net6.0\ISG107-W04-files1_1.jpeg" />
+    <Content Include="bin\Debug\net6.0\Plastic_04\Plastic_04_ambientocclusion.jpg" />
+    <Content Include="bin\Debug\net6.0\Plastic_04\Plastic_04_basecolor.jpg" />
+    <Content Include="bin\Debug\net6.0\Plastic_04\Plastic_04_basecolor.png" />
+    <Content Include="bin\Debug\net6.0\Plastic_04\Plastic_04_glossiness.jpg" />
+    <Content Include="bin\Debug\net6.0\Plastic_04\Plastic_04_height.jpg" />
+    <Content Include="bin\Debug\net6.0\Plastic_04\Plastic_04_metallic.jpg" />
+    <Content Include="bin\Debug\net6.0\Plastic_04\Plastic_04_normal.jpg" />
+    <Content Include="bin\Debug\net6.0\Plastic_04\Plastic_04_normal.png" />
+    <Content Include="bin\Debug\net6.0\Plastic_04\Plastic_04_normalOgl.jpg" />
+    <Content Include="bin\Debug\net6.0\Plastic_04\Plastic_04_roughness.jpg" />
+    <Content Include="bin\Debug\net6.0\skybox.png" />
+    <Content Include="bin\Debug\net6.0\Stone Wall\Material - Stonewall %28Grey%29_ao.png" />
+    <Content Include="bin\Debug\net6.0\Stone Wall\Material - Stonewall %28Grey%29_diffuseOriginal.png" />
+    <Content Include="bin\Debug\net6.0\Stone Wall\Material - Stonewall %28Grey%29_edge.png" />
+    <Content Include="bin\Debug\net6.0\Stone Wall\Material - Stonewall %28Grey%29_height.png" />
+    <Content Include="bin\Debug\net6.0\Stone Wall\Material - Stonewall %28Grey%29_metallic.png" />
+    <Content Include="bin\Debug\net6.0\Stone Wall\Material - Stonewall %28Grey%29_normal.png" />
+    <Content Include="bin\Debug\net6.0\Stone Wall\Material - Stonewall %28Grey%29_smoothness.png" />
+    <Content Include="bin\Debug\net6.0\watermill_diffuse.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="bin\Debug\net6.0\cubemap.frag" />
+    <None Include="bin\Debug\net6.0\cubemap.vert" />
+    <None Include="bin\Debug\net6.0\dresden_square_1k.hdr" />
+    <None Include="bin\Debug\net6.0\dresden_square_2k.hdr" />
+    <None Include="bin\Debug\net6.0\ISG107-W04-files1.gltf" />
+    <None Include="bin\Debug\net6.0\scene.gltf" />
+    <None Include="bin\Debug\net6.0\skybox.frag" />
+    <None Include="bin\Debug\net6.0\skybox.vert" />
+    <None Include="bin\Debug\net6.0\watermill.obj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Raylib-cs" Version="4.2.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="bin\Debug\net6.0\runtimes\" />
+  </ItemGroup>
+
+</Project>
