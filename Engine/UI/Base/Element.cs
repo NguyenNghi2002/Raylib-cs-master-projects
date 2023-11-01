@@ -282,6 +282,12 @@ namespace Engine.UI
 
 		public void SetSize(float value)
 			=> SetSize(value,value);
+
+		/// <summary>
+		/// Set size of element
+		/// </summary>
+		/// <param name="width"></param>
+		/// <param name="height"></param>
 		public void SetSize(float width, float height)
 		{
 			if (this.width == width && this.height == height)

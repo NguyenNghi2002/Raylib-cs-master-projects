@@ -17,8 +17,34 @@ public class Pulsable : Component
     {
         if(Entity.TryGetComponent<SpriteRenderer>(out var cpn))
         c = Core.StartCoroutine(ExecuteingPulse(cpn));
-    }
 
+        if(Entity.TryGetComponent<CircleRenderer>(out var cpnn))
+        c = Core.StartCoroutine(ExecuteingPulse(cpnn));
+    }
+    IEnumerator ExecuteingPulse(CircleRenderer cpn)
+    {
+        var origin = cpn.Color;
+        var elapse = 0f;
+
+
+        if (duration != 0)
+        {
+            //Console.WriteLine(elapse);
+
+            while (elapse < duration)
+            {
+                elapse += Time.DeltaTime;
+                elapse = elapse.ClampMax(duration);
+
+                var value = Vector4.Lerp(Raylib.ColorNormalize(origin), Raylib.ColorNormalize(Color), 1 - elapse / duration);
+                Entity.GetComponentInHirachy<CircleRenderer>().Color = Raylib.ColorFromNormalized(value);
+                yield return null;
+            }
+        }
+        Entity.GetComponentInHirachy<CircleRenderer>().Color = origin;
+
+        c = null;
+    }
     IEnumerator ExecuteingPulse(SpriteRenderer cpn)
     {
         var origin = cpn.TintColor;
@@ -59,6 +85,7 @@ public class Shakable : Component
     {
         c = Core.StartCoroutine(TranslateShake());
     }
+
     IEnumerator TranslateShake()
     {
         
@@ -66,9 +93,12 @@ public class Shakable : Component
         var elapse = 0f;
         while (elapse < Duration)
         {
-            elapse += Time.DeltaTime;
-            elapse = elapse.ClampMax(Duration);
-            Transform.Position = RayUtils.RandomPointInCircle(origin,Intensity * (1 - elapse/Duration)).ToVec3();
+            if(Time.TimeScale != 0)
+            {
+                 elapse += Time.DeltaTime;
+                elapse = elapse.ClampMax(Duration);
+                Transform.Position = RayUtils.RandomPointInCircle(origin,Intensity * (1 - elapse/Duration)).ToVec3();
+            }
 
             yield return null;
         }
@@ -103,10 +133,20 @@ public class Planet : Component, IUpdatable,IPoolable
 
     public override void OnAddedToEntity()
     {
+
+
+        ///normalize raw scale
+#if false
         var sr = Entity.GetComponentInChilds<SpriteRenderer>();
         if (sr != null)
-            sr.Transform.Scale = new (  (_radius * 2) / sr.Sprite.SourceScale.X);
-        
+            sr.Transform.Scale = new((_radius * 2) / sr.Sprite.SourceScale.X);
+
+        var rr = Entity.GetComponentInChilds<RingRenderer>();
+        if (rr != null)
+            rr.Transform.Scale = new Vector3(new Vector2((_radius) / rr.Radius), 1f);
+
+#endif
+
         slotTF.LocalPosition2 = Vector2.UnitY * _radius;
 
         var queue = GameSceneManager.Instance.planetNextQueue;

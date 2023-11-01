@@ -29,13 +29,13 @@ namespace Engine
         public List<GlobalManager> Managers = new List<GlobalManager>();
 
 
-
         /** BASIC MANAGERs **/
         TimerManager timerManager = new TimerManager();
         CoroutineManager coroutineManager = new CoroutineManager();
         ContentManager contentManager = new ContentManager();
 
 
+        public ICoroutine TransitionCoroutine;
         internal Transition _sceneTransition;
         public static Scene Scene
         {
@@ -246,9 +246,9 @@ namespace Engine
             _y = (int)Raylib.GetWindowPosition().Y;
 
             // Set up default Manager
-            Managers.Add(coroutineManager); 
-            Managers.Add(timerManager);
-            Managers.Add(contentManager);
+            AddManager(coroutineManager);
+            AddManager(timerManager);
+            AddManager(contentManager);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -376,7 +376,11 @@ namespace Engine
             Raylib.EndDrawing();
         }
         #endregion
-        public void AddManager(GlobalManager manager) => Managers.Add(manager);
+        public void AddManager(GlobalManager manager)
+        {
+
+            Managers.Add(manager);
+        }
         public bool RemoveManager(GlobalManager manager) => Managers.Remove(manager);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ITimer Schedule(float waitInSecond, bool repeat, object context, Action<ITimer> onTimeout)
@@ -391,8 +395,10 @@ namespace Engine
             => Instance.coroutineManager.StartCoroutine(enumerator);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T StartTransition<T>(T transition) where T : Transition
+        public static T StartTransition<T>(T transition,bool allowMultiple = false)where T : Transition
         {
+            if (!allowMultiple && Core.Instance._sceneTransition != null) return transition;
+
             Insist.IsNotNull(transition,"Transition can not be NULL");
             Core.Instance._sceneTransition = transition;
             return transition;

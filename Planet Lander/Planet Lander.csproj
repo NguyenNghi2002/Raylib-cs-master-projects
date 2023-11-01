@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="bin\Debug\net6.0\.asset\background01.png" />
     <Content Include="bin\Debug\net6.0\.asset\ball.png" />
     <Content Include="bin\Debug\net6.0\.asset\moon.png" />
     <Content Include="bin\Debug\net6.0\.asset\trail01.png" />

@@ -11,6 +11,7 @@ namespace Engine
         float FadeInDuration = 1f;
         float DelayBeforeFadeIn = 0.1f;
 
+
         Color _color;
         public FadeTransition(Func<Scene> sceneLoadAction) : base(sceneLoadAction)
         { }
@@ -20,29 +21,32 @@ namespace Engine
             var elapse = 0f;
             while (elapse < FadeOutDuration)
             {
-                elapse += Time.DeltaTime;
+                elapse += Time.UnscaledDeltaTime;
                 _color = Raylib.Fade(OverlayColor, Raymath.Lerp(0f, 1f, elapse / FadeOutDuration));
+                Console.WriteLine(elapse);
                 yield return null;
             }
-
+            Console.WriteLine("Faded   out");
+            OnFadedOut?.Invoke();
 
             yield return Core.StartCoroutine(LoadNewScene());
 
+            Console.WriteLine("load new scene");
 
             yield return new WaitForSecond(DelayBeforeFadeIn);
 
             elapse = 0f;
             while (elapse < FadeInDuration)
             {
-                elapse += Time.DeltaTime;
+                elapse += Time.UnscaledDeltaTime;
                 _color = Raylib.Fade(OverlayColor, Raymath.Lerp(1f, 0f, elapse / FadeOutDuration));
                 yield return null;
             }
-            Console.WriteLine(_color.a);
+            Console.WriteLine("Faded   in");
 
             TransitionCompleted();
+            Console.WriteLine("COMPLETED TRANSITION");
         }
-
         public override void Render()
         {
             if(Core.Scene != null)

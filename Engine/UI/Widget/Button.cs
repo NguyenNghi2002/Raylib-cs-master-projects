@@ -25,6 +25,12 @@ namespace Engine.UI
 			OnRightClicked += OnRightClickedCallBack;
 			return this;
         }
+
+		/// <summary>
+		/// Event will be called upon button was pressed
+		/// </summary>
+		/// <param name="OnChangedCallBack">feedback with whether checked or not checked button </param>
+		/// <returns></returns>
 		public Button AddOnChangedListener(Action<bool> OnChangedCallBack)
         {
 			OnChanged += OnChangedCallBack;

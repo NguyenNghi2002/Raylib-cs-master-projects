@@ -29,6 +29,6 @@ internal class CameraController : Engine.Component,IUpdatable
 
     public void Update()
     {
-        if(Planet != null) Scene.Camera.target = RaymathF.SmoothDamp(Scene.Camera.target, Planet.Transform.Position2,SmoothDamp);
+        if(Planet != null) Scene.Camera.target = RaymathF.SmoothDamp(Scene.Camera.target, Planet.Transform.Position2,2 * Time.DeltaTime) ;
     }
 }

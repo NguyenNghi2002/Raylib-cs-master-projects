@@ -21,6 +21,7 @@ namespace Engine
     {
         private class CoroutineObj : IPoolable, ICoroutine
         {
+            public bool IsPaused;
             public bool IsDone;
             public CoroutineObj? waitCoroutine;
             public IEnumerator Enumerator;
@@ -45,6 +46,7 @@ namespace Engine
         private List<CoroutineObj> _runnings = new List<CoroutineObj>();
         private List<CoroutineObj> _shouldRunNextFrame = new List<CoroutineObj>();
 
+        public IEnumerable<ICoroutine> Runnings => _runnings.Select(o=>o as ICoroutine);
         public bool bIsUpdating = false;
 
         public int UpdateOrder { get; set; } = 0;
@@ -115,13 +117,42 @@ namespace Engine
         }
         public void Clear()
         {
-            _runnings.ForEach(o => Pool<CoroutineObj>.Free(o));
-            _shouldRunNextFrame.ForEach(o => Pool<CoroutineObj>.Free(o));
+            foreach (var o in _runnings)
+            {
+                Pool<CoroutineObj>.Free(o);
+            }
+
+            foreach (var o in _shouldRunNextFrame)
+            {
+                Pool<CoroutineObj>.Free(o);
+            }
+
             _runnings.Clear();
             _shouldRunNextFrame.Clear();
         }
+        public void StopAll()
+        {
+            foreach (var o in _runnings)
+            {
+                o.Stop();
+                Pool<CoroutineObj>.Free(o);
+            }
+            _runnings.Clear();
+        }
+        public void TogglePauseAll(bool isPause)
+        {
+            foreach (var o in _runnings)
+                o.IsPaused = isPause;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="coroutine">coroutine object</param>
+        /// <param name="step">delta time</param>
+        /// <returns><see cref="true"/> to continue, <see cref="false"/> to break</returns>
         private bool Tick(CoroutineObj coroutine, float step)
         {
+            if (coroutine.IsPaused) return true;
 
             var iter = coroutine.Enumerator;
             if (!iter.MoveNext())

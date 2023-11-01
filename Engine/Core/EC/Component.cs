@@ -1,4 +1,5 @@
 ﻿using Engine.SceneManager;
+using System.Diagnostics;
 
 namespace Engine
 {
@@ -12,7 +13,13 @@ namespace Engine
             set => SetEntity(value);
         }
         public Transformation Transform
-            => Entity.Transform;
+        {
+            get 
+            {
+                if (Entity == null) return null;
+                return Entity.Transform;
+            }
+        }
 
         /// <summary>
         /// Shortcut for <see cref="Entity.Scene"/>
@@ -92,6 +99,7 @@ namespace Engine
         ~Component()
         {
             Debugging.Log("component [{0}] deconstructed from {1} ", Debugging.LogLevel.Comment, this,Entity);
+
         }
 
     }

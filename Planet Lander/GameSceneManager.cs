@@ -23,16 +23,22 @@ public class GameSceneManager : Component,ICustomInspectorImgui
 
     public uint Score = 0;
     public Label ScoreLabel_UI;
+    public float ScoreLabelScale = 64;
 
+    public float MinPlanet = 30, MaxPlanet = 100;
+    public float GameTimeScale = 1f;
+    public float GameDeltaTime => Time.UnscaledDeltaTime * GameTimeScale;
     public override void OnAddedToEntity()
     {
         //Setup UI
         if (Entity.TryGetComponent<UICanvas>(out var ui))
         {
+
+            var screenCenter = Core.Scene.ViewPortScale / 2f;
             Table mainTable = new Table()
                 .SetFillParent(true)
                 .Top().Right()
-                .DebugCell()
+                //.DebugCell()
                 .Pad(10)
                 ;
 
@@ -40,17 +46,59 @@ public class GameSceneManager : Component,ICustomInspectorImgui
                 .SetFillParent(true)
                 .Top()
                 .PadTop(10)
-
                 ;
 
-            Button pauseBtt = new TextButton("||",TextButtonStyle.CreateRaylib());
-            mainTable.Add(pauseBtt);
+            #region Pause dialog/window
 
-            ScoreLabel_UI = new Label(Score.ToString(),64);
+            Dialog pauseMenu = new Dialog("Pause", WindowStyle.CreateRaylib());
+            pauseMenu.SetFillParent(false);
+            pauseMenu.SetMovable(false);
+            pauseMenu.SetPosition(screenCenter.X, screenCenter.Y, (int)Align.Center); 
+            //pauseMenu.SetSize(screenCenter.X, screenCenter.Y);
+            pauseMenu.AddText("lkmafd");
+            pauseMenu.AddButton("Reset", TextButtonStyle.CreateRaylib())
+                .AddLeftMouseListener((b)=>ResetScene());
+            pauseMenu.Pad(10);
+            pauseMenu.SetZIndex(0);
+
+            pauseMenu.Pack();
+
+            #endregion
+
+            TextButton pauseBtt = new TextButton("||",TextButtonStyle.CreateRaylib());
+            
+            pauseBtt.AddLeftMouseListener((btt) =>
+            {
+                    var coroutineManager = Core.Instance.Managers.Find(m => typeof(CoroutineManager).IsAssignableFrom(m.GetType())) as CoroutineManager;
+                if (!pauseMenu.Remove())
+                {//If pop up
+                    ui.Stage.AddElement(pauseMenu);
+
+                    //pauseMenu.SetSize(screenCenter.X, screenCenter.Y);
+                    Player.Entity.GetComponent<Ball>().Enable = false;
+                    Entity.GetComponent<CameraController>().Enable = false;
+                    //CurrentPlanet.Entity.GetComponent<Shakable>().Enable
+                    //GameSceneManager.Instance.GameTimeScale = 0f;
+                    coroutineManager.TogglePauseAll(true);
+                }
+                else
+                {
+                    Player.Entity.GetComponent<Ball>().Enable = true;
+                    Entity.GetComponent<CameraController>().Enable = true;
+                    coroutineManager.TogglePauseAll(false);
+                    //GameSceneManager.Instance.GameTimeScale = 1f;
+                }
+            });
+
+            mainTable.Add(pauseBtt);
+            
+
+            ScoreLabel_UI = new Label(Score.ToString(),ScoreLabelScale);
             scoreTable.Add(ScoreLabel_UI);
 
-            ui.Stage.AddElement(mainTable);
+            ui.Stage.AddElement(mainTable).SetZIndex(10);
             ui.Stage.AddElement(scoreTable);
+
             ui.SetRenderOrder(10);
         }
 
@@ -67,6 +115,9 @@ public class GameSceneManager : Component,ICustomInspectorImgui
     }
     public override void OnRemovedFromEntity()
     {
+        var coroutineManager = Core.Instance.Managers.Find(m => typeof(CoroutineManager).IsAssignableFrom(m.GetType())) as CoroutineManager;
+        //coroutineManager.Runnings.Where((c) => c is not );
+
         Instance = null;
     }
 
@@ -74,7 +125,7 @@ public class GameSceneManager : Component,ICustomInspectorImgui
     {
         if(CurrentPlanet == null)
         {
-            var radius = RayUtils.RandF(40, 180);
+            var radius = RandomSize();
             //If queue have somthing, then pass to current planet
             //else create new entity Planet
             CurrentPlanet = planetNextQueue.TryDequeue(out var planet) ? 
@@ -98,18 +149,10 @@ public class GameSceneManager : Component,ICustomInspectorImgui
 
     }
 
-    Vector2 RandomPosition()
-    {
-        var minLengthRadius = (Scene.ViewPortWidth / 2f) - 30;
-        var maxLengthRadius = (Scene.ViewPortWidth / 2f);
-        var position = CurrentPlanet != null ? CurrentPlanet.centerTF.Position2 : Vector2.Zero;
-
-        return RayUtils.RandomPointInRing(position, minLengthRadius, maxLengthRadius);
-    }
 
     public Planet AddPlanet()
     {
-        var radius = RayUtils.RandF(40, 80);
+        var radius = RandomSize();
 
 
         SampleScene.CreatePlanet(Scene, RandomPosition(), radius, out Planet planet);
@@ -135,9 +178,9 @@ public class GameSceneManager : Component,ICustomInspectorImgui
         CurrentPlanet = next;
 
         ///Run Fade out animation then Destroy planet
-        Core.StartCoroutine(JumpOutAndDestroy(CurrentPlanet, prev));
+        junpAndDes =  Core.StartCoroutine(JumpOutAndDestroy(CurrentPlanet, prev));
     }
-
+    ICoroutine junpAndDes;
     /// <summary>
     /// Jump to next <see cref="Planet.slotTF"/>
     /// </summary>
@@ -147,15 +190,50 @@ public class GameSceneManager : Component,ICustomInspectorImgui
         CurrentPlanet.Shake();
         CurrentPlanet.Pulse();
 
-        ScoreLabel_UI.SetFontScale(ScoreLabel_UI.GetStyle().FontScale + 30);
+        //ScoreLabel_UI.SetFontScale(ScoreLabel_UI.GetStyle().FontScale + 30);
+        Core.StartCoroutine(BounceText(2));
         ScoreLabel_UI.SetText((++Score).ToString());
         AssurePlanets();
         
     }
 
+    IEnumerator BounceText(float scale)
+    {
+        float from = ScoreLabelScale;
+        float to = from * scale;
+        float offset = from-to;
 
+        float fdadeinDuration = 0.07f;
+        float fadeoutDuration = 0.3f;
+        float elapse = 0;
+        while (elapse < fdadeinDuration)
+        {
+            elapse += GameSceneManager.Instance.GameDeltaTime;
+            //Console.WriteLine(elapse);
+
+            var fontScale = Easings.EaseExpoOut(elapse, from, -offset, fdadeinDuration);
+
+            ScoreLabel_UI.SetFontScale(fontScale);
+
+            yield return null;
+        }
+
+        elapse = 0;
+        while (elapse < fadeoutDuration)
+        {
+            elapse += GameSceneManager.Instance.GameDeltaTime;
+            //Console.WriteLine(elapse);
+
+            var fontScale = Easings.EaseLinearNone(elapse, to, offset, fadeoutDuration);
+
+            ScoreLabel_UI.SetFontScale(fontScale);
+
+            yield return null;
+        }
+    }
     IEnumerator JumpOutAndDestroy(Planet curr,Planet prev)
     {
+        
         float duration = 3f;
         float elapse = 0;
         Vector2 from = prev.Transform.Position2;
@@ -164,17 +242,26 @@ public class GameSceneManager : Component,ICustomInspectorImgui
 
         while (elapse < duration)
         {
-            elapse += Time.DeltaTime;
+            elapse += GameSceneManager.Instance.GameDeltaTime;
             //Console.WriteLine(elapse);
 
-            var easingX = Easings.EaseSineIn (elapse, from.X, offset.X, duration);
+            var easingX = Easings.EaseSineIn(elapse, from.X, offset.X, duration);
             var easingY = Easings.EaseSineIn(elapse, from.Y, offset.Y, duration);
 
-            prev.Transform.LocalPosition2 = new Vector2(easingX, easingY);
+            ///Check in case entity removed but still access to current component
+            prev?.Entity?.Transform?.SetLocalPosition(new Vector2(easingX, easingY));
+
             yield return null;
         }
-        Entity.Destroy(prev.Entity);
+
+        ///Check in case entity remove but still access to current component
+        if(prev.Entity != null)
+            Entity.Destroy(prev.Entity);
+
+        junpAndDes = null;
     }
+
+
 
     internal void CalculateSlotTransform(Ball ball,float circleAmount,Planet curr,Planet next, bool clowise = false)
     {
@@ -205,7 +292,7 @@ public class GameSceneManager : Component,ICustomInspectorImgui
     {
         if(ImGui.Button("Reset Scene"))
         {
-            Core.StartTransition(new FadeTransition(() => new SampleScene("Sample", 720, 1280, Color.DARKBLUE, Color.BLACK)));
+            ResetScene();
         }
         ImGui.SliderFloat("ballSpeed",ref BallFloatSpeed,0,1000);
 
@@ -222,5 +309,28 @@ public class GameSceneManager : Component,ICustomInspectorImgui
 
             ImGui.EndChild();
         }
+        ImGui.Text(Time.TimeScale.ToString());
+    }
+
+    float RandomSize()
+        => RayUtils.RandF(MinPlanet, MaxPlanet);
+    Vector2 RandomPosition()
+    {
+        var minLengthRadius = (Scene.ViewPortWidth / 2f) - 30;
+        var maxLengthRadius = (Scene.ViewPortWidth / 2f);
+        var position = CurrentPlanet != null ? CurrentPlanet.centerTF.Position2 : Vector2.Zero;
+
+        return RayUtils.RandomPointInRing(position, minLengthRadius, maxLengthRadius);
+    }
+    void ResetScene()
+    {
+        var coroutineManager = Core.Instance.Managers.Find(m => typeof(CoroutineManager).IsAssignableFrom(m.GetType())) as CoroutineManager;
+
+
+        var transtion = new FadeTransition(() => new SampleScene("Sample", 720, 1280));
+
+
+        if(!transtion.IsPlaying)
+            Core.ScheduleNextFrame(null,(o)=>  Core.StartTransition(transtion,false) );
     }
 }

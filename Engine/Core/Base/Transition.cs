@@ -10,6 +10,9 @@ namespace Engine.SceneManager
         protected Func<Scene> loadSceneAction;
         public bool LoadOnBackground;
 
+        public Action OnFadedOut, OnFadedin, OnCompleted, OnBegined;
+
+
         public bool IsPlaying { get; internal set; }
 
         public Transition(Func<Scene> sceneLoadAction)

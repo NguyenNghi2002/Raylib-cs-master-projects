@@ -10,40 +10,42 @@ namespace Engine
 {
     public class ScrollingSpriteRenderer : TiledSpriteRenderer,IUpdatable
     {
-        public ScrollingSpriteRenderer(rTexture texture) : base(texture)
+        public ScrollingSpriteRenderer(rTexture texture,float scrollXSpeed = 15, float scrollYSpeed = 5) : base(texture)
         {
+            this.ScrollSpeedX = scrollXSpeed;
+            this.ScrollSpeedY = scrollYSpeed;
         }
 
         public int UpdateOrder { get; set; }
 
         public float ScrollSpeedX = 15;
-        public float ScrollSpeedY = 0;
+        public float ScrollSpeedY = 5;
 
 
         public void Update()
         {
-            if(ScrollSpeedX != 0) ScrollX -= ScrollSpeedX * Time.DeltaTime;
-            if(ScrollSpeedY != 0) ScrollY += ScrollSpeedY * Time.DeltaTime;
+            if(ScrollSpeedX != 0) SourceX -= ScrollSpeedX * Time.DeltaTime;
+            if(ScrollSpeedY != 0) SourceY += ScrollSpeedY * Time.DeltaTime;
         }
     }
     public class TiledSpriteRenderer : SpriteRenderer
     {
-        public float ScrollX
+        public float SourceX
         {
             get => _sourceRec.x;
             set => _sourceRec.x = value;
         }
-        public float ScrollY
+        public float SourceY
         {
             get => _sourceRec.y;
             set => _sourceRec.y = value;
         }
-        public float ScrollWidth
+        public float SourceWidth
         {
             get => _sourceRec.width;
             set => _sourceRec.width = value;
         }
-        public float ScrollHeight
+        public float SourceHeight
         {
             get => _sourceRec.height;
             set => _sourceRec.height = value;
