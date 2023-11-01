@@ -6,7 +6,7 @@ Raylib Website: https://www.raylib.com
 
 ## Example Application
 
-1) Create an Application Core class inherited from ```csharp Engine.Core``` class
+1) Create an Application Core class inherited from ```Engine.Core``` class
 ```csharp
 public class GameCore : Engine.Core
 {
