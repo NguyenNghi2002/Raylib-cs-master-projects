@@ -48,7 +48,7 @@ public class GameCore : Engine.Core
     }
 }
 ```
-- Creating Scene <br\>
+- Creating Scene <br/>
 An example from Planet Lander project
 ``` csharp
 internal class SampleScene : Scene
